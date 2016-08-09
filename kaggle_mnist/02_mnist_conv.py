@@ -1,7 +1,6 @@
 import tflearn
 from tflearn.layers.core import input_data, dropout, fully_connected
 from tflearn.layers.conv import conv_2d, max_pool_2d
-from tflearn.layers.normalization import local_response_normalization
 from tflearn.layers.estimator import regression
 import pandas as pd
 import numpy as np
@@ -23,6 +22,10 @@ validation_labels = labels[~msk].as_matrix()
 
 test = df_test.as_matrix().reshape([-1, 28, 28, 1])
 
+del df_train
+del df_test
+del msk
+
 # Building convolutional network
 network = input_data(shape=[None, 28, 28, 1], name='input')
 network = conv_2d(network, 32, 3, activation='relu')
@@ -36,15 +39,15 @@ network = regression(network, optimizer='adam', learning_rate=1e-5, loss='catego
 
 # Training
 model = tflearn.DNN(network, tensorboard_verbose=0)
-model.fit({'input': train_data}, {'target': train_labels}, n_epoch=1,
+model.fit({'input': train_data}, {'target': train_labels}, n_epoch=10,
           validation_set=({'input': validation_data}, {'target': validation_labels}), show_metric=True, run_id='convnet_mnist')
 
 predictions = None
-for chunk in np.split(test, 10):
+for chunk in np.split(test, 4):
     if predictions is None:
         predictions = model.predict(chunk)
     else:
-        np.concatenate((predictions, model.predict(chunk)), axis= 0)
+        predictions = np.append(predictions, model.predict(chunk), axis=0)
 
 predictions = pd.DataFrame(predictions).idxmax(axis=1)
 predictions.index += 1
