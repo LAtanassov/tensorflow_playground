@@ -12,10 +12,18 @@ ys_valid = h5f['ys_valid']
 xs_test = h5f['xs_test']
 
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.preprocessing import StandardScaler
 
 classifier = [
     RandomForestClassifier()
 ]
+
+sc = StandardScaler()
+
+sc.fit(xs_train)
+
+xs_train = sc.transform(xs_train)
+xs_valid = sc.transform(xs_valid)
 
 
 for clf in classifier:
