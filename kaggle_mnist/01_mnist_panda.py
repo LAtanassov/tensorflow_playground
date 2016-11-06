@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 import tflearn
 
 df_train = pd.read_csv('./data/train.csv', header=0)
